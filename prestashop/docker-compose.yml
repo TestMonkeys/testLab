@@ -1,0 +1,37 @@
+version: '3'
+services:
+
+  db:
+    image: mysql
+    container_name: sandbox_mysql
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: always
+    volumes:
+      - ./mysql/db:/var/lib/mysql
+      - ./mysql/conf:/etc/mysql/conf.d
+    env_file: .secrets/envMysql
+    ports:
+      - 3306:3306
+
+  prestashop1:
+    container_name: sandbox_prestashop1
+    hostname: tmSandboxPrestashop1
+    image: prestashop/prestashop:1.7-7.3-apache
+    environment:
+      - PS_DEV_MODE=false
+      - PS_DOMAIN=prestashop1.example.com
+      - PS_SSL_ENABLED=1
+      - PS_INSTALL_AUTO=1
+      - DB_SERVER=sandbox_mysql
+      - DB_NAME=prestashop1
+      - DB_PORT=3306
+      - DB_USER=prestashop1
+      - DB_PASSWD=prestashop1
+      - PS_ERASE_DB=1
+      - PS_LANGUAGE=en
+      - ADMIN_MAIL=admin@example.com
+      - ADMIN_PASSWORD=Password123
+      - PS_FOLDER_ADMIN=admin12
+      - PS_FOLDER_INSTALL=inst12
+    ports:
+      - 8251:80
